@@ -1,8 +1,19 @@
 .PHONY: default
 default:
-	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) -C buildroot
+	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/defconfig -C buildroot
 
 %:
-	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) -C buildroot $*
+	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/defconfig -C buildroot $*
 
-#linux-menuconfig: host-ccache
+.PHONY: toolchain
+toolchain:
+	$(MAKE) O=$(CURDIR)/toolchain BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/toolchain.config -C buildroot
+
+.PHONY: toolchain-%
+toolchain-%:
+	$(MAKE) O=$(CURDIR)/toolchain BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/toolchain.config -C buildroot $*
+
+.PHONY: install-%
+install-%:
+	cp output/images/bzImage /boot/bzImage-buildroot
+	dd if=output/images/rootfs.ext4 of=/dev/$*
