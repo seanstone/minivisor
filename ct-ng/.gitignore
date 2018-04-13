@@ -1,0 +1,4 @@
+build/
+dl/
+.config.old
+*.log
