@@ -40,7 +40,7 @@ IGVTG_XEN_DEPENDENCIES += argp-standalone
 endif
 IGVTG_XEN_INSTALL_TARGET_OPTS += DESTDIR=$(TARGET_DIR) install-tools
 IGVTG_XEN_MAKE_OPTS += dist-tools
-IGVTG_XEN_CONF_OPTS += --with-extra-qemuu-configure-args="--disable-sdl"
+#IGVTG_XEN_CONF_OPTS += --with-extra-qemuu-configure-args="--disable-sdl"
 
 define IGVTG_XEN_INSTALL_INIT_SYSV
 	mv $(TARGET_DIR)/etc/init.d/xencommons $(TARGET_DIR)/etc/init.d/S50xencommons
@@ -54,5 +54,6 @@ endif
 
 #IGVTG_XEN_CONF_OPTS += --with-system-seabios=/usr/share/qemu/bios-256k.bin
 #IGVTG_XEN_CONF_OPTS += --enable-ovmf
+IGVTG_XEN_CONF_OPTS += --disable-qemu-traditional --with-system-qemu=/usr/bin/qemu-system-x86_64 --enable-rombios
 
 $(eval $(autotools-package))
