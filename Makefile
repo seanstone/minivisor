@@ -15,5 +15,7 @@ toolchain-%:
 
 .PHONY: install-%
 install-%:
+	cp xen.cfg /boot/
+	cp output/images/xen.efi /boot/xen-buildroot.efi
 	cp output/images/bzImage /boot/bzImage-buildroot
 	dd if=output/images/rootfs.ext4 of=/dev/$*
