@@ -1,4 +1,4 @@
-build/
+.build/
 dl/
 .config.old
 *.log
