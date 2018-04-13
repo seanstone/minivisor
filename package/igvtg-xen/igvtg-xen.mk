@@ -52,4 +52,7 @@ IGVTG_XEN_INSTALL_TARGET = NO
 IGVTG_XEN_CONF_OPTS += --disable-tools
 endif
 
+#IGVTG_XEN_CONF_OPTS += --with-system-seabios=/usr/share/qemu/bios-256k.bin
+#IGVTG_XEN_CONF_OPTS += --enable-ovmf
+
 $(eval $(autotools-package))
