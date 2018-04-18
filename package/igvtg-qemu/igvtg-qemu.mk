@@ -45,6 +45,7 @@ IGVTG_QEMU_OPTS += 	--target-list=x86_64-softmmu \
 					--disable-usb-redir \
 					--disable-docs \
 					--disable-curses \
+					--enable-fbdev
 
 # Override CPP, as it expects to be able to call it like it'd
 # call the compiler.
