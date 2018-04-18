@@ -7,7 +7,8 @@ default:
 
 .PHONY: ct-ng-%
 ct-ng-%:
-	ct-ng -C ct-ng $*
+	mkdir -p crosstool-ng/dl
+	cd crosstool-ng && DEFCONFIG=$(CURDIR)/configs/ct-ng.config ./ct-ng $*
 
 .PHONY: install-%
 install-%:
