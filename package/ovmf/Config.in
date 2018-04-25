@@ -1,0 +1,6 @@
+config BR2_PACKAGE_OVMF
+	bool "ovmf"
+	help
+	  Tianocore UEFI firmware for qemu.
+
+	  http://www.tianocore.org/edk2/
