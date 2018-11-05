@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OVMF_VERSION = vUDK2018
+OVMF_VERSION = edk2-stable201808
 OVMF_SITE = https://github.com/tianocore/edk2.git
 OVMF_SITE_METHOD := git
 OVMF_LICENSE = BSD

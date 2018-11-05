@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-IGVTG_XEN_VERSION = xengt-stable-4.10
+IGVTG_XEN_VERSION = 2018-q1-xengt-stable-4.10
 IGVTG_XEN_SITE = https://github.com/intel/Igvtg-xen.git
 IGVTG_XEN_SITE_METHOD := git
 IGVTG_XEN_LICENSE = GPL-2.0
