@@ -84,17 +84,6 @@ diff --git a/qemu-options.hx b/qemu-options.hx
 index cb48c1a..f07d2fc 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -284,8 +284,8 @@ Set default value of @var{driver}'s property @var{prop} to @var{value}, e.g.:
- qemu-system-i386 -global ide-hd.physical_block_size=4096 disk-image.img
- @end example
- 
--In particular, you can use this to set driver properties for devices which are 
--created automatically by the machine model. To create a device which is not 
-+In particular, you can use this to set driver properties for devices which are
-+created automatically by the machine model. To create a device which is not
- created automatically and set properties on it, use -@option{device}.
- 
- -global @var{driver}.@var{prop}=@var{value} is shorthand for -global
 @@ -1253,6 +1253,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
      "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
      "-display vnc=<display>[,<optargs>]\n"
@@ -1690,15 +1679,6 @@ diff --git a/vl.c b/vl.c
 index 9363393..74e5d6a 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2046,7 +2046,7 @@ static void select_vgahw(const char *p)
-                 exit(1);
-             }
- 	    vga_interface_type = t;
--	    printf("%s vga is %s\n", __func__, ti->opt_name);           
-+	    printf("%s vga is %s\n", __func__, ti->opt_name);
- 	    break;
- 	}
-     }
 @@ -2078,6 +2078,7 @@ typedef enum DisplayType {
      DT_COCOA,
      DT_GTK,
