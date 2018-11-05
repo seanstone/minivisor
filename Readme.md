@@ -1,4 +1,4 @@
-Minimal Linux to serve as Xen Dom0
+Minimal Linux to serve as VM host
 
 1. Build toolchain:
 
