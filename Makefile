@@ -5,6 +5,13 @@ default:
 %:
 	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/configs/defconfig -C buildroot $*
 
+.PHONY: prep
+prep: ct-ng-defconfig defconfig
+
+.PHONY: ct-ng-defconfig
+ct-ng-defconfig:
+	cp configs/ct-ng.config toolchain/.config
+
 .PHONY: ct-ng-savedefconfig
 ct-ng-savedefconfig:
 	cp toolchain/.config configs/ct-ng.config
