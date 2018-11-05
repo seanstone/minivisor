@@ -5,10 +5,13 @@ default:
 %:
 	$(MAKE) O=$(CURDIR)/output BR2_EXTERNAL=$(CURDIR) BR2_DEFCONFIG=$(CURDIR)/configs/defconfig -C buildroot $*
 
+.PHONY: ct-ng-savedefconfig
+ct-ng-savedefconfig:
+	cp toolchain/.config configs/ct-ng.config
+
 .PHONY: ct-ng-%
 ct-ng-%:
-	mkdir -p crosstool-ng/dl
-	cd crosstool-ng && DEFCONFIG=$(CURDIR)/configs/ct-ng.config ./ct-ng $*
+	cd toolchain && ct-ng $*
 
 .PHONY: install-%
 install-%:
