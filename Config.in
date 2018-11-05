@@ -1,1 +1,4 @@
 source "$BR2_EXTERNAL_BUILDROOTOS_PATH/package/igvtg-xen/Config.in"
+source "$BR2_EXTERNAL_BUILDROOTOS_PATH/package/igvtg-qemu/Config.in"
+source "$BR2_EXTERNAL_BUILDROOTOS_PATH/package/seabios/Config.in"
+source "$BR2_EXTERNAL_BUILDROOTOS_PATH/package/ovmf/Config.in"
