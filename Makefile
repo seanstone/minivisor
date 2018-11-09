@@ -10,6 +10,7 @@ prep: ct-ng-defconfig defconfig
 
 .PHONY: ct-ng-defconfig
 ct-ng-defconfig:
+	mkdir -p toolchain
 	cp configs/ct-ng.config toolchain/.config
 
 .PHONY: ct-ng-savedefconfig
