@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-IGVTG_QEMU_VERSION = 2018-q1-stable-2.12.0
+IGVTG_QEMU_VERSION = 2018-q3-stable-2.12.0
 IGVTG_QEMU_SITE = https://github.com/intel/Igvtg-qemu.git
 IGVTG_QEMU_SITE_METHOD := git
 IGVTG_QEMU_LICENSE = GPL-2.0, LGPL-2.1, MIT, BSD-3-Clause, BSD-2-Clause, Others/BSD-1c
