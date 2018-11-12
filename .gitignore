@@ -1,4 +1,5 @@
-output/
-dl/
-buildroot-ccache/
-toolchain/
+/output/
+/dl/
+/buildroot-ccache/
+/toolchain/
+/mnt/
