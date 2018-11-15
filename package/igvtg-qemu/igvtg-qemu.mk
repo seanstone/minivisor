@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-IGVTG_QEMU_VERSION = 2018-q3-stable-2.12.0
-IGVTG_QEMU_SITE = https://github.com/intel/Igvtg-qemu.git
-IGVTG_QEMU_SITE_METHOD := git
+IGVTG_QEMU_VERSION = 3.0.0
+IGVTG_QEMU_SOURCE = qemu-$(IGVTG_QEMU_VERSION).tar.xz
+IGVTG_QEMU_SITE = https://download.qemu.org
 IGVTG_QEMU_LICENSE = GPL-2.0, LGPL-2.1, MIT, BSD-3-Clause, BSD-2-Clause, Others/BSD-1c
 IGVTG_QEMU_LICENSE_FILES = COPYING COPYING.LIB
 # NOTE: there is no top-level license file for non-(L)GPL licenses;

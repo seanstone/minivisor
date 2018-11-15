@@ -1,8 +1,8 @@
 diff --git a/configure b/configure
-index 2baaaa94b7..5b890c2666 100755
+index 5489d11abd..6b0e4ac168 100755
 --- a/configure
 +++ b/configure
-@@ -323,6 +323,7 @@ fdt=""
+@@ -345,6 +345,7 @@ fdt=""
  netmap="no"
  sdl=""
  sdlabi=""
@@ -10,7 +10,7 @@ index 2baaaa94b7..5b890c2666 100755
  virtfs=""
  mpath=""
  vnc="yes"
-@@ -818,6 +819,7 @@ Linux)
+@@ -870,6 +871,7 @@ Linux)
    vhost_crypto="yes"
    vhost_scsi="yes"
    vhost_vsock="yes"
@@ -18,7 +18,7 @@ index 2baaaa94b7..5b890c2666 100755
    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
    supported_os="yes"
  ;;
-@@ -982,6 +984,10 @@ for opt do
+@@ -1038,6 +1040,10 @@ for opt do
    ;;
    --enable-qom-cast-debug) qom_cast_debug="yes"
    ;;
@@ -29,7 +29,7 @@ index 2baaaa94b7..5b890c2666 100755
    --disable-virtfs) virtfs="no"
    ;;
    --enable-virtfs) virtfs="yes"
-@@ -5780,6 +5786,7 @@ echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
+@@ -5914,6 +5920,7 @@ echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
  echo "Intel GVT-g support $vgt"
  echo "GTK support       $gtk $(echo_version $gtk $gtk_version)"
  echo "GTK GL support    $gtk_gl"
@@ -37,7 +37,7 @@ index 2baaaa94b7..5b890c2666 100755
  echo "VTE support       $vte $(echo_version $vte $vteversion)"
  echo "TLS priority      $tls_priority"
  echo "GNUTLS support    $gnutls"
-@@ -6114,6 +6121,9 @@ fi
+@@ -6250,6 +6257,9 @@ fi
  if test "$vgt" = "yes" ; then
    echo "CONFIG_VGT=y" >> $config_host_mak
  fi
@@ -47,19 +47,6 @@ index 2baaaa94b7..5b890c2666 100755
  if test "$cocoa" = "yes" ; then
    echo "CONFIG_COCOA=y" >> $config_host_mak
  fi
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 1b0be071cc..a0d755d248 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -247,7 +247,7 @@ static int usb_host_init(void)
-     if (rc != 0) {
-         return -1;
-     }
--    libusb_set_debug(ctx, loglevel);
-+    libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, loglevel);
- #ifdef CONFIG_WIN32
-     /* FIXME: add support for Windows. */
- #else
 diff --git a/include/ui/console.h b/include/ui/console.h
 index 981b519dde..bc91282709 100644
 --- a/include/ui/console.h
@@ -74,10 +61,10 @@ index 981b519dde..bc91282709 100644
 +
  #endif
 diff --git a/qapi/ui.json b/qapi/ui.json
-index 5d01ad4304..66007f3f37 100644
+index 4ca91bb45a..a42289c282 100644
 --- a/qapi/ui.json
 +++ b/qapi/ui.json
-@@ -1029,7 +1029,7 @@
+@@ -1057,7 +1057,7 @@
  ##
  { 'enum'    : 'DisplayType',
    'data'    : [ 'default', 'none', 'gtk', 'sdl',
@@ -86,15 +73,8 @@ index 5d01ad4304..66007f3f37 100644
  
  ##
  # @DisplayOptions:
-@@ -1056,4 +1056,5 @@
-                 'sdl'            : 'DisplayNoOpts',
-                 'egl-headless'   : 'DisplayNoOpts',
-                 'curses'         : 'DisplayNoOpts',
--                'cocoa'          : 'DisplayNoOpts' } }
-+                'cocoa'          : 'DisplayNoOpts',
-+                'fbdev'          : 'DisplayNoOpts' } }
 diff --git a/qemu-options.hx b/qemu-options.hx
-index c1cc64d673..8d0344d8f7 100644
+index 09b9de6856..320b19815e 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
 @@ -1244,6 +1244,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
@@ -123,36 +103,11 @@ index c1cc64d673..8d0344d8f7 100644
  @item none
  Do not display video output. The guest will still see an emulated
  graphics card, but its output will not be displayed to the QEMU
-diff --git a/trace-events b/trace-events
-index ed71f44649..b431dd2c2d 100644
---- a/trace-events
-+++ b/trace-events
-@@ -104,6 +104,20 @@ gdbstub_err_invalid_rle(void) "got invalid RLE sequence"
- gdbstub_err_checksum_invalid(uint8_t ch) "got invalid command checksum digit: 0x%02x"
- gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packet with incorrect checksum, expected=0x%02x, received=0x%02x"
- 
-+# ui/fbdev.c
-+fbdev_enabled(void) ""
-+fbdev_cleanup(void) ""
-+fbdev_vt_activate(int vtno, int wait) "vtno %d, wait %d"
-+fbdev_vt_activated(void) ""
-+fbdev_vt_release_request(void) ""
-+fbdev_vt_released(void) ""
-+fbdev_vt_aquire_request(void) ""
-+fbdev_vt_aquired(void) ""
-+fbdev_kbd_raw(int enable) "enable %d"
-+fbdev_kbd_event(int keycode, const char *kname, int up) "keycode 0x%x [%s],down %d"
-+fbdev_dpy_resize(int w, int h) "%dx%d"
-+fbdev_dpy_redraw(void)
-+
- ### Guest events, keep at bottom
- 
- 
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index cc784346cb..d0b63724f0 100644
+index 00f6976c30..ccad9a02c6 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -62,3 +62,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
+@@ -65,3 +65,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
  egl-helpers.o-libs += $(OPENGL_LIBS)
  egl-context.o-libs += $(OPENGL_LIBS)
  egl-headless.o-libs += $(OPENGL_LIBS)
@@ -160,10 +115,10 @@ index cc784346cb..d0b63724f0 100644
 +common-obj-$(CONFIG_FBDEV) += fbdev.o
 diff --git a/ui/fbdev.c b/ui/fbdev.c
 new file mode 100644
-index 0000000000..90390afb0f
+index 0000000000..3760464c1f
 --- /dev/null
 +++ b/ui/fbdev.c
-@@ -0,0 +1,1144 @@
+@@ -0,0 +1,1156 @@
 +/*
 + * linux fbdev output driver.
 + *
@@ -317,8 +272,21 @@ index 0000000000..90390afb0f
 +
 +    x = buf[1];
 +    y = -buf[2];
-+    b = buf[0] & 0x7;
-+    (void)b;
++    b = buf[0];
++
++    static uint32_t bmap[INPUT_BUTTON__MAX] = {
++        [INPUT_BUTTON_LEFT]        = 0x01,
++        [INPUT_BUTTON_MIDDLE]      = 0x04,
++        [INPUT_BUTTON_RIGHT]       = 0x02,
++        [INPUT_BUTTON_WHEEL_UP]    = 0x10,
++        [INPUT_BUTTON_WHEEL_DOWN]  = 0x20,
++    };
++    static uint32_t prev_b;
++
++    if (prev_b != b) {
++        qemu_input_update_buttons(dcl->con, bmap, prev_b, b);
++        prev_b = b;
++    }
 +
 +    if (qemu_input_is_absolute()) {
 +        static int ax, ay;
@@ -335,15 +303,13 @@ index 0000000000..90390afb0f
 +        if (ay >= ch*scale) {
 +            ay = ch*scale-1;
 +        }
-+        // qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, ax, cw*scale);
-+        // qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, ay, ch*scale);
-+        // qemu_input_event_sync();
-+        // TODO
-+        // kbd_mouse_event(ax * 0x7FFF / (cw*scale),
-+        //                 ay * 0x7FFF / (ch*scale), 0, b);
++        qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, ax, 0, cw*scale);
++        qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, ay, 0, ch*scale);
 +    } else {
-+        //kbd_mouse_event(x, y, 0, b);
++        qemu_input_queue_rel(dcl->con, INPUT_AXIS_X, x);
++        qemu_input_queue_rel(dcl->con, INPUT_AXIS_Y, y);
 +    }
++    qemu_input_event_sync();
 +}
 +
 +static int init_mouse(void)
@@ -610,10 +576,11 @@ index 0000000000..90390afb0f
 +        qemu_input_event_send_key_number(NULL, SCANCODE_EMUL0, true);
 +    }
 +    if (up) {
-+        qemu_input_event_send_key_number(NULL, scancode | SCANCODE_UP, true);
++        qemu_input_event_send_key_number(NULL, scancode, false);
 +    } else {
-+        qemu_input_event_send_key_number(NULL, scancode & SCANCODE_KEYCODEMASK, true);
++        qemu_input_event_send_key_number(NULL, scancode, true);
 +    }
++
 +}
 +
 +static void send_keysym(int keycode, int shift)
@@ -1261,25 +1228,25 @@ index 0000000000..90390afb0f
 +void fbdev_display_init(DisplayState *ds, DisplayOptions *o)
 +{
 +    if (dcl != NULL) {
-+        return ;//0;
++        return;
 +    }
 +
 +    if (fbdev_init(NULL, NULL) != 0) {
-+        return ;//-1;
++        exit(-1);
 +    }
 +    exit_notifier.notify = fbdev_exit_notifier;
 +    qemu_add_exit_notifier(&exit_notifier);
 +    fbdev_switch_init();
 +    fbdev_catch_exit_signals();
 +    init_mouse();
-+    use_scale = false; // scale
++    use_scale = false;
 +
 +    dcl = g_new0(DisplayChangeListener, 1);
 +    dcl->ops = &fbdev_ops;
 +    register_displaychangelistener(dcl);
 +
 +    //trace_fbdev_enabled();
-+    //return 0;
++    atexit(fbdev_display_uninit);
 +}
 +
 +void fbdev_display_uninit(void)
@@ -1702,25 +1669,3 @@ index 0000000000..058af28e2d
 +    [KEY_MIN_INTERESTING] = "KEY_MIN_INTERESTING",
 +    [KEY_MAX] = "KEY_MAX",
 +    [KEY_CNT] = "KEY_CNT",
-diff --git a/vl.c b/vl.c
-index 3ffba8bb52..365ab64539 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2072,7 +2072,7 @@ static void select_vgahw(const char *p)
-                 exit(1);
-             }
- 	    vga_interface_type = t;
--	    printf("%s vga is %s\n", __func__, ti->opt_name);           
-+	    printf("%s vga is %s\n", __func__, ti->opt_name);
- 	    break;
- 	}
-     }
-@@ -2205,6 +2205,8 @@ static void parse_display(const char *p)
-             }
-             opts = nextopt;
-         }
-+    } else if (strstart(p, "fbdev", &opts)) {
-+        dpy.type = DISPLAY_TYPE_FBDEV;
-     } else if (strstart(p, "none", &opts)) {
-         dpy.type = DISPLAY_TYPE_NONE;
-     } else {
