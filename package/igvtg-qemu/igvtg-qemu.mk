@@ -78,11 +78,10 @@ define IGVTG_QEMU_CONFIGURE_CMDS
 endef
 
 define IGVTG_QEMU_BUILD_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
 endef
 
-define IGVTG_QEMU_INSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) $(IGVTG_QEMU_MAKE_ENV) DESTDIR=$(TARGET_DIR) install
-endef
+# define IGVTG_QEMU_INSTALL_TARGET_CMDS
+# endef
 
 $(eval $(generic-package))
