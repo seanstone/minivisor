@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SEABIOS_VERSION = rel-1.11.2
+SEABIOS_VERSION = rel-1.12.0
 SEABIOS_SITE = https://github.com/qemu/seabios
 SEABIOS_SITE_METHOD := git
 SEABIOS_LICENSE = LGPL-3.0
