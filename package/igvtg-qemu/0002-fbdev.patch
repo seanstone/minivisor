@@ -1,33 +1,24 @@
-diff --git a/.gitignore b/.gitignore
-index cf65316..467ca00 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -134,3 +134,4 @@ trace-dtrace-root.h
- trace-dtrace-root.dtrace
- trace-ust-all.h
- trace-ust-all.c
-+/build/
 diff --git a/configure b/configure
-index 115a128..b3a0dbc 100755
+index 5489d11abd..6b0e4ac168 100755
 --- a/configure
 +++ b/configure
-@@ -284,6 +284,7 @@ fdt=""
+@@ -345,6 +345,7 @@ fdt=""
  netmap="no"
  sdl=""
  sdlabi=""
 +fbdev="no"
  virtfs=""
+ mpath=""
  vnc="yes"
- sparse="no"
-@@ -780,6 +781,7 @@ Linux)
-   vhost_net="yes"
+@@ -870,6 +871,7 @@ Linux)
+   vhost_crypto="yes"
    vhost_scsi="yes"
    vhost_vsock="yes"
 +  fbdev="yes"
    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
    supported_os="yes"
  ;;
-@@ -942,6 +944,10 @@ for opt do
+@@ -1038,6 +1040,10 @@ for opt do
    ;;
    --enable-qom-cast-debug) qom_cast_debug="yes"
    ;;
@@ -38,7 +29,7 @@ index 115a128..b3a0dbc 100755
    --disable-virtfs) virtfs="no"
    ;;
    --enable-virtfs) virtfs="yes"
-@@ -5291,6 +5297,7 @@ echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
+@@ -5914,6 +5920,7 @@ echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
  echo "Intel GVT-g support $vgt"
  echo "GTK support       $gtk $(echo_version $gtk $gtk_version)"
  echo "GTK GL support    $gtk_gl"
@@ -46,16 +37,7 @@ index 115a128..b3a0dbc 100755
  echo "VTE support       $vte $(echo_version $vte $vteversion)"
  echo "TLS priority      $tls_priority"
  echo "GNUTLS support    $gnutls"
-@@ -5480,7 +5487,7 @@ if test "$mingw32" = "yes" ; then
-     echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
-   fi
-   if test "$guest_agent_msi" = "yes"; then
--    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak  
-+    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
-     echo "QEMU_GA_MSI_MINGW_DLL_PATH=${QEMU_GA_MSI_MINGW_DLL_PATH}" >> $config_host_mak
-     echo "QEMU_GA_MSI_WITH_VSS=${QEMU_GA_MSI_WITH_VSS}" >> $config_host_mak
-     echo "QEMU_GA_MSI_ARCH=${QEMU_GA_MSI_ARCH}" >> $config_host_mak
-@@ -5585,6 +5592,9 @@ fi
+@@ -6250,6 +6257,9 @@ fi
  if test "$vgt" = "yes" ; then
    echo "CONFIG_VGT=y" >> $config_host_mak
  fi
@@ -66,25 +48,36 @@ index 115a128..b3a0dbc 100755
    echo "CONFIG_COCOA=y" >> $config_host_mak
  fi
 diff --git a/include/ui/console.h b/include/ui/console.h
-index b8117cc..b575587 100644
+index 981b519dde..bc91282709 100644
 --- a/include/ui/console.h
 +++ b/include/ui/console.h
-@@ -459,6 +459,10 @@ static inline void sdl_display_init(DisplayState *ds, int full_screen,
- }
- #endif
+@@ -463,4 +463,8 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp);
+ /* input.c */
+ int index_from_key(const char *key, size_t key_length);
  
 +/* fbdev.c */
-+int fbdev_display_init(const char *device, bool scale, Error **err);
++void fbdev_display_init(DisplayState *ds, DisplayOptions *o);
 +void fbdev_display_uninit(void);
 +
- /* cocoa.m */
- #ifdef CONFIG_COCOA
- void cocoa_display_init(DisplayState *ds, int full_screen);
+ #endif
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 4ca91bb45a..a42289c282 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -1057,7 +1057,7 @@
+ ##
+ { 'enum'    : 'DisplayType',
+   'data'    : [ 'default', 'none', 'gtk', 'sdl',
+-                'egl-headless', 'curses', 'cocoa' ] }
++                'egl-headless', 'curses', 'cocoa', 'fbdev' ] }
+ 
+ ##
+ # @DisplayOptions:
 diff --git a/qemu-options.hx b/qemu-options.hx
-index cb48c1a..f07d2fc 100644
+index 09b9de6856..320b19815e 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -1253,6 +1253,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
+@@ -1244,6 +1244,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
      "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
      "-display vnc=<display>[,<optargs>]\n"
      "-display curses\n"
@@ -92,7 +85,7 @@ index cb48c1a..f07d2fc 100644
      "-display none"
      "                select display type\n"
      "The default display is equivalent to\n"
-@@ -1264,6 +1265,8 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
+@@ -1255,6 +1256,8 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
              "\t\"-display cocoa\"\n"
  #elif defined(CONFIG_VNC)
              "\t\"-vnc localhost:0,to=99,id=default\"\n"
@@ -101,7 +94,7 @@ index cb48c1a..f07d2fc 100644
  #else
              "\t\"-display none\"\n"
  #endif
-@@ -1285,6 +1288,8 @@ support a text mode, QEMU can display this output using a
+@@ -1276,6 +1279,8 @@ support a text mode, QEMU can display this output using a
  curses/ncurses interface. Nothing is displayed when the graphics
  device is in graphical mode or if the graphics device does not support
  a text mode. Generally only the VGA device models support text mode.
@@ -110,48 +103,22 @@ index cb48c1a..f07d2fc 100644
  @item none
  Do not display video output. The guest will still see an emulated
  graphics card, but its output will not be displayed to the QEMU
-diff --git a/trace-events b/trace-events
-index 1f50f56..3e3c752 100644
---- a/trace-events
-+++ b/trace-events
-@@ -65,6 +65,20 @@ memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned si
- memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- 
-+# ui/fbdev.c
-+fbdev_enabled(void) ""
-+fbdev_cleanup(void) ""
-+fbdev_vt_activate(int vtno, int wait) "vtno %d, wait %d"
-+fbdev_vt_activated(void) ""
-+fbdev_vt_release_request(void) ""
-+fbdev_vt_released(void) ""
-+fbdev_vt_aquire_request(void) ""
-+fbdev_vt_aquired(void) ""
-+fbdev_kbd_raw(int enable) "enable %d"
-+fbdev_kbd_event(int keycode, const char *kname, int up) "keycode 0x%x [%s],down %d"
-+fbdev_dpy_resize(int w, int h) "%dx%d"
-+fbdev_dpy_redraw(void)
-+
- ### Guest events, keep at bottom
- 
- 
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 44fe159..8c14a70 100644
+index 00f6976c30..ccad9a02c6 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -16,6 +16,7 @@ common-obj-$(CONFIG_COCOA) += cocoa.o
- common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(CONFIG_GTK) += gtk.o x_keymap.o
+@@ -65,3 +65,5 @@ console-gl.o-libs += $(OPENGL_LIBS)
+ egl-helpers.o-libs += $(OPENGL_LIBS)
+ egl-context.o-libs += $(OPENGL_LIBS)
+ egl-headless.o-libs += $(OPENGL_LIBS)
++
 +common-obj-$(CONFIG_FBDEV) += fbdev.o
- 
- ifeq ($(CONFIG_SDLABI),1.2)
- sdl.mo-objs := sdl.o sdl_zoom.o
 diff --git a/ui/fbdev.c b/ui/fbdev.c
-index e69de29..05b7a65 100644
---- a/ui/fbdev.c
+new file mode 100644
+index 0000000000..3760464c1f
+--- /dev/null
 +++ b/ui/fbdev.c
-@@ -0,0 +1,1130 @@
+@@ -0,0 +1,1156 @@
 +/*
 + * linux fbdev output driver.
 + *
@@ -186,6 +153,7 @@ index e69de29..05b7a65 100644
 +#include "ui/console.h"
 +#include "sysemu/sysemu.h"
 +#include "ui/input.h"
++#include "qapi/error.h"
 +
 +/*
 + * must be last so we get the linux input layer
@@ -304,7 +272,21 @@ index e69de29..05b7a65 100644
 +
 +    x = buf[1];
 +    y = -buf[2];
-+    b = buf[0] & 0x7;
++    b = buf[0];
++
++    static uint32_t bmap[INPUT_BUTTON__MAX] = {
++        [INPUT_BUTTON_LEFT]        = 0x01,
++        [INPUT_BUTTON_MIDDLE]      = 0x04,
++        [INPUT_BUTTON_RIGHT]       = 0x02,
++        [INPUT_BUTTON_WHEEL_UP]    = 0x10,
++        [INPUT_BUTTON_WHEEL_DOWN]  = 0x20,
++    };
++    static uint32_t prev_b;
++
++    if (prev_b != b) {
++        qemu_input_update_buttons(dcl->con, bmap, prev_b, b);
++        prev_b = b;
++    }
 +
 +    if (qemu_input_is_absolute()) {
 +        static int ax, ay;
@@ -321,15 +303,13 @@ index e69de29..05b7a65 100644
 +        if (ay >= ch*scale) {
 +            ay = ch*scale-1;
 +        }
-+        // qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, ax, cw*scale);
-+        // qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, ay, ch*scale);
-+        // qemu_input_event_sync();
-+        // TODO
-+        // kbd_mouse_event(ax * 0x7FFF / (cw*scale),
-+        //                 ay * 0x7FFF / (ch*scale), 0, b);
++        qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, ax, 0, cw*scale);
++        qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, ay, 0, ch*scale);
 +    } else {
-+        //kbd_mouse_event(x, y, 0, b);
++        qemu_input_queue_rel(dcl->con, INPUT_AXIS_X, x);
++        qemu_input_queue_rel(dcl->con, INPUT_AXIS_Y, y);
 +    }
++    qemu_input_event_sync();
 +}
 +
 +static int init_mouse(void)
@@ -596,10 +576,11 @@ index e69de29..05b7a65 100644
 +        qemu_input_event_send_key_number(NULL, SCANCODE_EMUL0, true);
 +    }
 +    if (up) {
-+        qemu_input_event_send_key_number(NULL, scancode | SCANCODE_UP, true);
++        qemu_input_event_send_key_number(NULL, scancode, false);
 +    } else {
-+        qemu_input_event_send_key_number(NULL, scancode & SCANCODE_KEYCODEMASK, true);
++        qemu_input_event_send_key_number(NULL, scancode, true);
 +    }
++
 +}
 +
 +static void send_keysym(int keycode, int shift)
@@ -803,7 +784,7 @@ index e69de29..05b7a65 100644
 +    }
 +    fb = open(device, O_RDWR);
 +    if (fb == -1) {
-+        error_setg(err, "open %s: %s\n", device, strerror(errno));
++        //error_setg(err, "open %s: %s\n", device, strerror(errno));
 +        return -1;
 +    }
 +
@@ -816,15 +797,15 @@ index e69de29..05b7a65 100644
 +        snprintf(ttyname, sizeof(ttyname), "/dev/tty0");
 +        tty = open(ttyname, O_RDWR);
 +        if (tty == -1) {
-+            error_setg(err, "open %s: %s\n", ttyname, strerror(errno));
++            //error_setg(err, "open %s: %s\n", ttyname, strerror(errno));
 +            goto err_early;
 +        }
 +        if (ioctl(tty, VT_OPENQRY, &vtno) < 0) {
-+            error_setg(err, "ioctl VT_OPENQRY: %s\n", strerror(errno));
++            //error_setg(err, "ioctl VT_OPENQRY: %s\n", strerror(errno));
 +            goto err_early;
 +        }
 +        if (ioctl(tty, VT_GETSTATE, &vts) < 0) {
-+            error_setg(err, "ioctl VT_GETSTATE: %s\n", strerror(errno));
++            //error_setg(err, "ioctl VT_GETSTATE: %s\n", strerror(errno));
 +            goto err_early;
 +        }
 +        close(tty);
@@ -832,7 +813,7 @@ index e69de29..05b7a65 100644
 +        snprintf(ttyname, sizeof(ttyname), "/dev/tty%d", vtno);
 +        tty = open(ttyname, O_RDWR);
 +        if (tty == -1) {
-+            error_setg(err, "open %s: %s\n", ttyname, strerror(errno));
++            //error_setg(err, "open %s: %s\n", ttyname, strerror(errno));
 +            goto err_early;
 +        }
 +        orig_vtno = vts.v_active;
@@ -846,38 +827,38 @@ index e69de29..05b7a65 100644
 +
 +    /* get current settings (which we have to restore) */
 +    if (ioctl(fb, FBIOGET_VSCREENINFO, &fb_ovar) < 0) {
-+        error_setg(err, "ioctl FBIOGET_VSCREENINFO: %s\n", strerror(errno));
++        //error_setg(err, "ioctl FBIOGET_VSCREENINFO: %s\n", strerror(errno));
 +        goto err_early;
 +    }
 +    if (ioctl(tty, KDGETMODE, &kd_omode) < 0) {
-+        error_setg(err, "ioctl KDGETMODE: %s\n", strerror(errno));
++        //error_setg(err, "ioctl KDGETMODE: %s\n", strerror(errno));
 +        goto err_early;
 +    }
 +    if (ioctl(tty, VT_GETMODE, &vt_omode) < 0) {
-+        error_setg(err, "ioctl VT_GETMODE: %s\n", strerror(errno));
++        //error_setg(err, "ioctl VT_GETMODE: %s\n", strerror(errno));
 +        goto err_early;
 +    }
 +
 +    /* checks & initialisation */
 +    if (ioctl(fb, FBIOGET_FSCREENINFO, &fb_fix) < 0) {
-+        error_setg(err, "ioctl : %s\n", strerror(errno));
++        //error_setg(err, "ioctl : %s\n", strerror(errno));
 +        perror("ioctl FBIOGET_FSCREENINFO");
 +        goto err;
 +    }
 +    if (ioctl(fb, FBIOGET_VSCREENINFO, &fb_var) < 0) {
-+        error_setg(err, "ioctl FBIOGET_VSCREENINFO: %s\n", strerror(errno));
++        //error_setg(err, "ioctl FBIOGET_VSCREENINFO: %s\n", strerror(errno));
 +        goto err;
 +    }
 +    if (fb_fix.type != FB_TYPE_PACKED_PIXELS) {
-+        error_setg(err, "can handle only packed pixel frame buffers\n");
++        //error_setg(err, "can handle only packed pixel frame buffers\n");
 +        goto err;
 +    }
 +    switch (fb_var.bits_per_pixel) {
 +    case 32:
 +        break;
 +    default:
-+        error_setg(err, "can't handle %d bpp frame buffers\n",
-+                fb_var.bits_per_pixel);
++        //error_setg(err, "can't handle %d bpp frame buffers\n",
++                //fb_var.bits_per_pixel);
 +        goto err;
 +    }
 +
@@ -887,7 +868,7 @@ index e69de29..05b7a65 100644
 +    fb_mem = mmap(NULL, fb_fix.smem_len+fb_mem_offset,
 +                  PROT_READ|PROT_WRITE, MAP_SHARED, fb, 0);
 +    if (fb_mem == MAP_FAILED) {
-+        error_setg(err, "mmap: %s\n", strerror(errno));
++        //error_setg(err, "mmap: %s\n", strerror(errno));
 +        goto err;
 +    }
 +    /* move viewport to upper left corner */
@@ -895,12 +876,12 @@ index e69de29..05b7a65 100644
 +        fb_var.xoffset = 0;
 +        fb_var.yoffset = 0;
 +        if (ioctl(fb, FBIOPAN_DISPLAY, &fb_var) < 0) {
-+            error_setg(err, "ioctl FBIOPAN_DISPLAY: %s\n", strerror(errno));
++            //error_setg(err, "ioctl FBIOPAN_DISPLAY: %s\n", strerror(errno));
 +            goto err;
 +        }
 +    }
 +    if (ioctl(tty, KDSETMODE, KD_GRAPHICS) < 0) {
-+        error_setg(err, "ioctl KDSETMODE: %s\n", strerror(errno));
++        //error_setg(err, "ioctl KDSETMODE: %s\n", strerror(errno));
 +        goto err;
 +    }
 +    /* some fb drivers need this again after switching to graphics ... */
@@ -1244,28 +1225,28 @@ index e69de29..05b7a65 100644
 +    fbdev_cleanup();
 +}
 +
-+int fbdev_display_init(const char *device, bool scale, Error **err)
++void fbdev_display_init(DisplayState *ds, DisplayOptions *o)
 +{
 +    if (dcl != NULL) {
-+        return 0;
++        return;
 +    }
 +
-+    if (fbdev_init(device, err) != 0) {
-+        return -1;
++    if (fbdev_init(NULL, NULL) != 0) {
++        exit(-1);
 +    }
 +    exit_notifier.notify = fbdev_exit_notifier;
 +    qemu_add_exit_notifier(&exit_notifier);
 +    fbdev_switch_init();
 +    fbdev_catch_exit_signals();
 +    init_mouse();
-+    use_scale = scale;
++    use_scale = false;
 +
 +    dcl = g_new0(DisplayChangeListener, 1);
 +    dcl->ops = &fbdev_ops;
 +    register_displaychangelistener(dcl);
 +
 +    //trace_fbdev_enabled();
-+    return 0;
++    atexit(fbdev_display_uninit);
 +}
 +
 +void fbdev_display_uninit(void)
@@ -1282,9 +1263,22 @@ index e69de29..05b7a65 100644
 +    qemu_remove_exit_notifier(&exit_notifier);
 +    uninit_mouse();
 +}
++
++static QemuDisplay qemu_display_fbdev = {
++    .type       = DISPLAY_TYPE_FBDEV,
++    .init       = fbdev_display_init,
++};
++
++static void register_fbdev(void)
++{
++    qemu_display_register(&qemu_display_fbdev);
++}
++
++type_init(register_fbdev);
 diff --git a/ui/linux-keynames.h b/ui/linux-keynames.h
-index e69de29..058af28 100644
---- a/ui/linux-keynames.h
+new file mode 100644
+index 0000000000..058af28e2d
+--- /dev/null
 +++ b/ui/linux-keynames.h
 @@ -0,0 +1,388 @@
 +/*
@@ -1675,49 +1669,3 @@ index e69de29..058af28 100644
 +    [KEY_MIN_INTERESTING] = "KEY_MIN_INTERESTING",
 +    [KEY_MAX] = "KEY_MAX",
 +    [KEY_CNT] = "KEY_CNT",
-diff --git a/vl.c b/vl.c
-index 9363393..74e5d6a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2078,6 +2078,7 @@ typedef enum DisplayType {
-     DT_COCOA,
-     DT_GTK,
-     DT_EGL,
-+    DT_FBDEV,
-     DT_NONE,
- } DisplayType;
- 
-@@ -2205,6 +2206,13 @@ static DisplayType select_display(const char *p)
- #else
-         error_report("GTK support is disabled");
-         exit(1);
-+#endif
-+    } else if (strstart(p, "fbdev", &opts)) {
-+#ifdef CONFIG_FBDEV
-+        display = DT_FBDEV;
-+#else
-+        error_report("fbdev support is disabled");
-+        exit(1);
- #endif
-     } else if (strstart(p, "none", &opts)) {
-         display = DT_NONE;
-@@ -4735,6 +4743,19 @@ int main(int argc, char **argv, char **envp)
-     case DT_CURSES:
-         curses_display_init(ds, full_screen);
-         break;
-+    #if defined(CONFIG_FBDEV)
-+    case DT_FBDEV:
-+    {
-+        Error *local_err = NULL;
-+        if (fbdev_display_init(NULL, false, &local_err) != 0) {
-+            if (local_err) {
-+                fprintf(stderr, "%s\n", error_get_pretty(local_err));
-+            }
-+            exit(1);
-+        }
-+        break;
-+    }
-+    #endif
-     case DT_SDL:
-         sdl_display_init(ds, full_screen, no_frame);
-         break;
