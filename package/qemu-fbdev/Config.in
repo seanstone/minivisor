@@ -1,5 +1,5 @@
 config BR2_PACKAGE_QEMU_FBDEV
-	bool "QEMU"
+	bool "qemu-fbdev"
 	depends on BR2_PACKAGE_QEMU_ARCH_SUPPORTS_TARGET
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_USE_WCHAR # gettext
