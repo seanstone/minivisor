@@ -1,4 +1,2 @@
-source "../package/igvtg-xen/Config.in"
-source "../package/igvtg-qemu/Config.in"
-source "../package/seabios/Config.in"
+source "../package/qemu-fbdev/Config.in"
 source "../package/ovmf/Config.in"

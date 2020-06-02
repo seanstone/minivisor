@@ -1,14 +1,14 @@
 ################################################################################
 #
-# Igvtg-qemu
+# qemu-fbdev
 #
 ################################################################################
 
-IGVTG_QEMU_VERSION = 3.0.0
-IGVTG_QEMU_SOURCE = qemu-$(IGVTG_QEMU_VERSION).tar.xz
-IGVTG_QEMU_SITE = https://download.qemu.org
-IGVTG_QEMU_LICENSE = GPL-2.0, LGPL-2.1, MIT, BSD-3-Clause, BSD-2-Clause, Others/BSD-1c
-IGVTG_QEMU_LICENSE_FILES = COPYING COPYING.LIB
+QEMU_FBDEV_VERSION = 3.0.0
+QEMU_FBDEV_SOURCE = qemu-$(IGVTG_QEMU_VERSION).tar.xz
+QEMU_FBDEV_SITE = https://download.qemu.org
+QEMU_FBDEV_LICENSE = GPL-2.0, LGPL-2.1, MIT, BSD-3-Clause, BSD-2-Clause, Others/BSD-1c
+QEMU_FBDEV_LICENSE_FILES = COPYING COPYING.LIB
 # NOTE: there is no top-level license file for non-(L)GPL licenses;
 #       the non-(L)GPL license texts are specified in the affected
 #       individual source files.
@@ -16,18 +16,18 @@ IGVTG_QEMU_LICENSE_FILES = COPYING COPYING.LIB
 #-------------------------------------------------------------
 # Target-qemu
 
-IGVTG_QEMU_DEPENDENCIES = host-pkgconf host-python libglib2 zlib pixman
+QEMU_FBDEV_DEPENDENCIES = host-pkgconf host-python libglib2 zlib pixman
 
 # Need the LIBS variable because librt and libm are
 # not automatically pulled. :-(
-IGVTG_QEMU_LIBS = -lrt -lm
+QEMU_FBDEV_LIBS = -lrt -lm
 
-IGVTG_QEMU_VARS = \
+QEMU_FBDEV_VARS = \
 	LIBTOOL=$(HOST_DIR)/bin/libtool \
 	PYTHON=$(HOST_DIR)/bin/python2 \
 	PYTHONPATH=$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages
 
-IGVTG_QEMU_OPTS += 	--target-list=x86_64-softmmu \
+QEMU_FBDEV_OPTS += 	--target-list=x86_64-softmmu \
 					--enable-system \
 					--disable-linux-user \
 					--disable-bsd-user \
@@ -49,7 +49,7 @@ IGVTG_QEMU_OPTS += 	--target-list=x86_64-softmmu \
 
 # Override CPP, as it expects to be able to call it like it'd
 # call the compiler.
-define IGVTG_QEMU_CONFIGURE_CMDS
+define QEMU_FBDEV_CONFIGURE_CMDS
 	( cd $(@D); \
 		LIBS='$(IGVTG_QEMU_LIBS)' \
 		$(TARGET_CONFIGURE_OPTS) \
@@ -77,11 +77,11 @@ define IGVTG_QEMU_CONFIGURE_CMDS
 	)
 endef
 
-define IGVTG_QEMU_BUILD_CMDS
+define QEMU_FBDEV_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
 endef
 
-# define IGVTG_QEMU_INSTALL_TARGET_CMDS
+# define QEMU_FBDEV_INSTALL_TARGET_CMDS
 # endef
 
 $(eval $(generic-package))
