@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-QEMU_FBDEV_VERSION = e5b3b11
+QEMU_FBDEV_VERSION = 42bdccf4
 QEMU_FBDEV_SITE = git://github.com/seanstone/qemu.git
 QEMU_FBDEV_SITE_METHOD = git
 QEMU_FBDEV_GIT_SUBMODULES = YES
@@ -35,7 +35,7 @@ QEMU_FBDEV_OPTS += 	--target-list=x86_64-softmmu \
 					--enable-tools \
 					--enable-kvm \
     				--disable-xen \
-					--enable-vnc \
+					--disable-vnc \
 					--disable-spice \
 					--disable-sdl \
 					--enable-vgt \
@@ -65,7 +65,6 @@ define QEMU_FBDEV_CONFIGURE_CMDS
 			--disable-virtfs \
 			--disable-brlapi \
 			--disable-curl \
-			--disable-bluez \
 			--disable-vde \
 			--disable-linux-aio \
 			--disable-cap-ng \
