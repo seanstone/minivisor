@@ -7,6 +7,7 @@
 QEMU_FBDEV_VERSION = e5b3b11
 QEMU_FBDEV_SITE = git://github.com/seanstone/qemu.git
 QEMU_FBDEV_SITE_METHOD = git
+QEMU_FBDEV_GIT_SUBMODULES = YES
 QEMU_FBDEV_LICENSE = GPL-2.0, LGPL-2.1, MIT, BSD-3-Clause, BSD-2-Clause, Others/BSD-1c
 QEMU_FBDEV_LICENSE_FILES = COPYING COPYING.LIB
 # NOTE: there is no top-level license file for non-(L)GPL licenses;
