@@ -7,6 +7,7 @@ config BR2_PACKAGE_QEMU_FBDEV
 	select BR2_PACKAGE_LIBGLIB2
 	select BR2_PACKAGE_PIXMAN
 	select BR2_PACKAGE_ZLIB
+	select BR2_PACKAGE_LIBUSB
 	help
 	  QEMU is a generic and open source machine emulator and
 	  virtualizer.

@@ -17,7 +17,7 @@ QEMU_FBDEV_LICENSE_FILES = COPYING COPYING.LIB
 #-------------------------------------------------------------
 # Target-qemu
 
-QEMU_FBDEV_DEPENDENCIES = host-pkgconf host-python libglib2 zlib pixman
+QEMU_FBDEV_DEPENDENCIES = host-pkgconf host-python libglib2 zlib pixman libusb
 
 # Need the LIBS variable because librt and libm are
 # not automatically pulled. :-(
