@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-QEMU_FBDEV_VERSION = 42bdccf4
+QEMU_FBDEV_VERSION = ec86a6e922
 QEMU_FBDEV_SITE = git://github.com/seanstone/qemu.git
 QEMU_FBDEV_SITE_METHOD = git
 QEMU_FBDEV_GIT_SUBMODULES = YES
@@ -25,7 +25,7 @@ QEMU_FBDEV_LIBS = -lrt -lm
 
 QEMU_FBDEV_VARS = \
 	LIBTOOL=$(HOST_DIR)/bin/libtool \
-	PYTHON=$(HOST_DIR)/bin/python2 \
+	PYTHON=$(HOST_DIR)/bin/python3 \
 	PYTHONPATH=$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages
 
 QEMU_FBDEV_OPTS += 	--target-list=x86_64-softmmu \
@@ -38,7 +38,6 @@ QEMU_FBDEV_OPTS += 	--target-list=x86_64-softmmu \
 					--disable-vnc \
 					--disable-spice \
 					--disable-sdl \
-					--enable-vgt \
 					--disable-gtk \
 					--enable-vhost-net \
 					--disable-opengl \
@@ -52,11 +51,11 @@ QEMU_FBDEV_OPTS += 	--target-list=x86_64-softmmu \
 # call the compiler.
 define QEMU_FBDEV_CONFIGURE_CMDS
 	( cd $(@D); \
-		LIBS='$(IGVTG_QEMU_LIBS)' \
+		LIBS='$(QEMU_FBDEV_LIBS)' \
 		$(TARGET_CONFIGURE_OPTS) \
 		$(TARGET_CONFIGURE_ARGS) \
 		CPP="$(TARGET_CC) -E" \
-		$(IGVTG_QEMU_VARS) \
+		$(QEMU_FBDEV_VARS) \
 		./configure \
 			--prefix=/usr \
 			--cross-prefix=$(TARGET_CROSS) \
@@ -73,7 +72,7 @@ define QEMU_FBDEV_CONFIGURE_CMDS
 			--disable-strip \
 			--disable-seccomp \
 			--disable-sparse \
-			$(IGVTG_QEMU_OPTS) \
+			$(QEMU_FBDEV_OPTS) \
 	)
 endef
 
