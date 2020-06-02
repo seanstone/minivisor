@@ -7,6 +7,7 @@
 OVMF_VERSION = edk2-stable202002
 OVMF_SITE = https://github.com/tianocore/edk2.git
 OVMF_SITE_METHOD := git
+OVMF_GIT_SUBMODULES = YES
 OVMF_LICENSE = BSD
 OVMF_LICENSE_FILES = License.txt
 OVMF_DEPENDENCIES =
