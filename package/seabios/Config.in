@@ -1,6 +1,0 @@
-config BR2_PACKAGE_SEABIOS
-	bool "seabios"
-	help
-	  SeaBIOS is an open source implementation of a 16bit X86 BIOS.
-
-	  https://seabios.org
