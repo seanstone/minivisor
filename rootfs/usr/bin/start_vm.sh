@@ -25,6 +25,10 @@ qemu-system-x86_64 -enable-kvm -m 8192 -cpu host,kvm=on,vendor=GenuineIntel,+inv
 	  -monitor stdio \
 	  -vga vmware \
 	  -display fbdev \
-	  -device usb-host,hostbus=1,hostport=3
+	  -device usb-host,hostbus=1,hostport=1 \
+	  -device usb-host,hostbus=1,hostport=2 \
+	  -device usb-host,hostbus=1,hostport=3 \
+	  -device usb-host,hostbus=1,hostport=4 \
+	  -device usb-host,hostbus=2,hostport=1
 
 #-netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device vmxnet3,netdev=net0,id=net0,mac=52:54:00:c9:18:27 \
